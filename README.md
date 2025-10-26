@@ -58,7 +58,3 @@ bundle exec rake rswag:specs:swaggerize
 **Backend:** Rails 8, SQLite, Solid Queue  
 **External API:** Dictionary API (api.dictionaryapi.dev)  
 **Testing:** RSpec, FactoryBot, WebMock
-
----
-
-✅ All requirements implemented
