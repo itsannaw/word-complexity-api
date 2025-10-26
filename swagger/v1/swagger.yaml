@@ -1,0 +1,135 @@
+---
+openapi: 3.0.1
+info:
+  title: Word Complexity API
+  version: v1
+  description: API for calculating word complexity scores using background job processing
+paths:
+  "/complexity-score":
+    post:
+      summary: Creates a complexity calculation job
+      tags:
+      - Complexity Scores
+      description: Creates a new background job to calculate complexity scores for
+        the provided words
+      parameters: []
+      responses:
+        '202':
+          description: Job created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id:
+                    type: string
+                    description: Unique identifier for the job
+                    example: a1b2c3d4e5f6
+        '400':
+          description: Bad request - invalid input
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                words:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of words to analyze for complexity
+                  example:
+                  - happy
+                  - sad
+                  - beautiful
+                  - ugly
+              required:
+              - words
+  "/complexity-score/{job_id}":
+    get:
+      summary: Retrieves job status and results
+      tags:
+      - Complexity Scores
+      description: Retrieves the current status and results of a complexity calculation
+        job
+      parameters:
+      - name: job_id
+        in: path
+        description: Job identifier returned from the create endpoint
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Job status retrieved successfully
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                  properties:
+                    status:
+                      type: string
+                      enum:
+                      - pending
+                      - in_progress
+                      description: Current job status
+                - type: object
+                  properties:
+                    status:
+                      type: string
+                      enum:
+                      - completed
+                      description: Job completed successfully
+                    result:
+                      type: object
+                      additionalProperties:
+                        type: number
+                      description: Complexity scores for each word
+                      example:
+                        happy: 3.5
+                        sad: 2.8
+                        beautiful: 4.2
+                        ugly: 2.1
+                - type: object
+                  properties:
+                    status:
+                      type: string
+                      enum:
+                      - failed
+                      description: Job failed
+                    error:
+                      type: string
+                      description: Error message
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+servers:
+- url: http://localhost:3000
+  description: Development server
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        errors:
+          type: array
+          items:
+            type: string
+          description: List of error messages
