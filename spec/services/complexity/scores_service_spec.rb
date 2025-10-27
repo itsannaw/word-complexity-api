@@ -126,70 +126,69 @@ RSpec.describe Complexity::ScoresService do
   describe '.get_job' do
     subject(:result) { described_class.get_job(job_id) }
 
-    context 'when job exists' do
+    let(:job_id) { complexity_score.job_id }
+
+    context 'with pending status' do
       let(:complexity_score) { create(:complexity_score) }
-      let(:job_id) { complexity_score.job_id }
 
-      context 'with pending status' do
-        it 'returns ok status' do
-          expect(result[:status]).to eq(:ok)
-        end
-
-        it 'returns job status' do
-          expect(result[:data][:status]).to eq('pending')
-        end
-
-        it 'does not include result' do
-          expect(result[:data]).not_to have_key(:result)
-        end
+      it 'returns ok status' do
+        expect(result[:status]).to eq(:ok)
       end
 
-      context 'with in_progress status' do
-        let(:complexity_score) { create(:complexity_score, :in_progress) }
-
-        it 'returns ok status' do
-          expect(result[:status]).to eq(:ok)
-        end
-
-        it 'returns job status' do
-          expect(result[:data][:status]).to eq('in_progress')
-        end
-
-        it 'does not include result' do
-          expect(result[:data]).not_to have_key(:result)
-        end
+      it 'returns job status' do
+        expect(result[:data][:status]).to eq('pending')
       end
 
-      context 'with completed status' do
-        let(:complexity_score) { create(:complexity_score, :completed) }
+      it 'does not include result' do
+        expect(result[:data]).not_to have_key(:result)
+      end
+    end
 
-        it 'returns ok status' do
-          expect(result[:status]).to eq(:ok)
-        end
+    context 'with in_progress status' do
+      let(:complexity_score) { create(:complexity_score, :in_progress) }
 
-        it 'returns job status' do
-          expect(result[:data][:status]).to eq('completed')
-        end
-
-        it 'includes result hash' do
-          expect(result[:data][:result]).to eq({ 'happy' => 3.5, 'sad' => 2.8, 'angry' => 3.2 })
-        end
+      it 'returns ok status' do
+        expect(result[:status]).to eq(:ok)
       end
 
-      context 'with failed status' do
-        let(:complexity_score) { create(:complexity_score, :failed) }
+      it 'returns job status' do
+        expect(result[:data][:status]).to eq('in_progress')
+      end
 
-        it 'returns ok status' do
-          expect(result[:status]).to eq(:ok)
-        end
+      it 'does not include result' do
+        expect(result[:data]).not_to have_key(:result)
+      end
+    end
 
-        it 'returns job status' do
-          expect(result[:data][:status]).to eq('failed')
-        end
+    context 'with completed status' do
+      let(:complexity_score) { create(:complexity_score, :completed) }
 
-        it 'includes error message' do
-          expect(result[:data][:error]).to eq('API error occurred')
-        end
+      it 'returns ok status' do
+        expect(result[:status]).to eq(:ok)
+      end
+
+      it 'returns job status' do
+        expect(result[:data][:status]).to eq('completed')
+      end
+
+      it 'includes result hash' do
+        expect(result[:data][:result]).to eq({ 'happy' => 3.5, 'sad' => 2.8, 'angry' => 3.2 })
+      end
+    end
+
+    context 'with failed status' do
+      let(:complexity_score) { create(:complexity_score, :failed) }
+
+      it 'returns ok status' do
+        expect(result[:status]).to eq(:ok)
+      end
+
+      it 'returns job status' do
+        expect(result[:data][:status]).to eq('failed')
+      end
+
+      it 'includes error message' do
+        expect(result[:data][:error]).to eq('API error occurred')
       end
     end
 

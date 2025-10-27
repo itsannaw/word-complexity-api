@@ -14,21 +14,25 @@ RSpec.describe ComplexityScore, type: :model do
   end
 
   describe 'database columns' do
+    subject(:model) { described_class.new }
+
     it {
-      expect(subject).to have_db_column(:id)
-      expect(subject).to have_db_column(:job_id)
-      expect(subject).to have_db_column(:status)
-      expect(subject).to have_db_column(:words)
-      expect(subject).to have_db_column(:result)
-      expect(subject).to have_db_column(:created_at)
-      expect(subject).to have_db_column(:updated_at)
+      expect(model).to have_db_column(:id)
+      expect(model).to have_db_column(:job_id)
+      expect(model).to have_db_column(:status)
+      expect(model).to have_db_column(:words)
+      expect(model).to have_db_column(:result)
+      expect(model).to have_db_column(:created_at)
+      expect(model).to have_db_column(:updated_at)
     }
   end
 
   describe 'indexes' do
+    subject(:model) { described_class.new }
+
     it {
-      expect(subject).to have_db_index(:job_id).unique(true)
-      expect(subject).to have_db_index(:status)
+      expect(model).to have_db_index(:job_id).unique(true)
+      expect(model).to have_db_index(:status)
     }
   end
 
@@ -42,7 +46,10 @@ RSpec.describe ComplexityScore, type: :model do
     end
 
     context 'when words is invalid JSON' do
-      before { complexity_score.update_column(:words, 'invalid json') }
+      before do
+        complexity_score.words = 'invalid json'
+        complexity_score.save(validate: false)
+      end
 
       it 'returns empty array' do
         expect(complexity_score.words_array).to eq([])
